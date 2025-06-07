@@ -3,7 +3,21 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/MemoryCard.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/rede/ClienteJogo.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/model/Carta.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/controller/JogoController.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/view/TelaJogo.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/view/ComponentesUtil.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/Main.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/model/Jogador.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/view/TelaRanking.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/model/Partida.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/controller/XMLManager.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/data/ranking.xml</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/model/Tabuleiro.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/view/TelaInicial.java</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/data/historico.xml</file>
+            <file>file:/C:/Users/deivi/OneDrive/Documentos/NetBeansProjects/memory-card/MemoryCard/src/memorycard/rede/ServidorJogo.java</file>
         </group>
     </open-files>
 </project-private>
