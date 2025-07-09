@@ -6,6 +6,7 @@ public class Carta {
     private boolean virada;
     private boolean encontrada;
 
+    // sempre inicializa virada como false (carta virada pra baixo)
     public Carta(int id, String imagem) {
         this.id = id;
         this.imagem = imagem;
@@ -13,10 +14,12 @@ public class Carta {
         this.encontrada = false;
     }
 
+    // método pra virar carta
     public void virar() {
         this.virada = !this.virada;
     }
 
+    // compara se carta possui o mesmo ID (forma um par)
     public boolean comparar(Carta outra) {
         return this.id == outra.id;
     }

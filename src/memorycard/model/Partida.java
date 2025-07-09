@@ -33,10 +33,12 @@ public class Partida {
         return true;
     }
 
+    // confere se duas cartas já foram selecionadas
     public boolean podeVerificarPar() {
         return primeiraCarta != -1 && segundaCarta != -1;
     }
 
+    // confere se as duas cartas selecionadas são um par
     public boolean verificarParSelecionado() {
         if (!podeVerificarPar()) return false;
 
@@ -44,6 +46,7 @@ public class Partida {
         if (par) {
             jogadorAtual.incrementarPontos();
         } else {
+             // se nao for par, desvira e troca turno
             tabuleiro.getCarta(primeiraCarta).virar();
             tabuleiro.getCarta(segundaCarta).virar();
             alternarTurno();
@@ -71,9 +74,10 @@ public class Partida {
 
         if (jogador1.getPontuacao() > jogador2.getPontuacao()) return jogador1;
         if (jogador2.getPontuacao() > jogador1.getPontuacao()) return jogador2;
-        return null;
+        return null; // retorna null em caso de empate
     }
 
+    // getters
     public Jogador getJogadorAtual() {
         return jogadorAtual;
     }
