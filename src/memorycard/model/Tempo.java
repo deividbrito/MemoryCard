@@ -1,4 +1,4 @@
-package memorycard;
+package memorycard.model;
 
 public class Tempo extends Thread {
     private Cronometro cronometro;

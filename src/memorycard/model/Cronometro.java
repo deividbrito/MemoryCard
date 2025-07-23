@@ -1,4 +1,4 @@
-package memorycard;
+package memorycard.model;
 
 public class Cronometro extends Thread {
     private boolean rodando = true;

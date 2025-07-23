@@ -18,11 +18,11 @@ public class Partida {
 
     public boolean selecionarCarta(int indice) {
         Carta carta = tabuleiro.getCarta(indice);
-        if (carta == null || carta.isVirada() || carta.isEncontrada()) {
+        if (carta == null || carta.isRevelada() || carta.isEncontrada()) {
             return false;
         }
 
-        carta.virar();
+        carta.setRevelada(true);
 
         if (primeiraCarta == -1) {
             primeiraCarta = indice;
@@ -33,12 +33,10 @@ public class Partida {
         return true;
     }
 
-    // confere se duas cartas já foram selecionadas
     public boolean podeVerificarPar() {
         return primeiraCarta != -1 && segundaCarta != -1;
     }
 
-    // confere se as duas cartas selecionadas são um par
     public boolean verificarParSelecionado() {
         if (!podeVerificarPar()) return false;
 
@@ -46,9 +44,8 @@ public class Partida {
         if (par) {
             jogadorAtual.incrementarPontos();
         } else {
-             // se nao for par, desvira e troca turno
-            tabuleiro.getCarta(primeiraCarta).virar();
-            tabuleiro.getCarta(segundaCarta).virar();
+            tabuleiro.getCarta(primeiraCarta).setRevelada(false);
+            tabuleiro.getCarta(segundaCarta).setRevelada(false);
             alternarTurno();
         }
 
@@ -63,10 +60,7 @@ public class Partida {
     }
 
     public boolean isJogoFinalizado() {
-        for (Carta carta : tabuleiro.getCartas()) {
-            if (!carta.isEncontrada()) return false;
-        }
-        return true;
+        return tabuleiro.jogoCompleto();
     }
 
     public Jogador getVencedor() {
@@ -74,10 +68,9 @@ public class Partida {
 
         if (jogador1.getPontuacao() > jogador2.getPontuacao()) return jogador1;
         if (jogador2.getPontuacao() > jogador1.getPontuacao()) return jogador2;
-        return null; // retorna null em caso de empate
+        return null;
     }
 
-    // getters
     public Jogador getJogadorAtual() {
         return jogadorAtual;
     }

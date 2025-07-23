@@ -4,6 +4,7 @@ import memorycard.model.*;
 
 import java.util.Scanner;
 
+// fazendo teste da lógica de jogo apenas utilizando models de maneira local/offline
 public class MainLocal {
     public static void main(String[] args) {
         Jogador j1 = new Jogador("Alice");
