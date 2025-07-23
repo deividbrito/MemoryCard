@@ -7,6 +7,7 @@ public class Servidor {
     private static Tabuleiro tabuleiro;
     private static int pontosJogador1;
     private static int pontosJogador2;
+    private static Cronometro cronometro;
 
     public static void main(String[] args) throws IOException {
         ServerSocket servidor = new ServerSocket(12345);
@@ -51,9 +52,14 @@ public class Servidor {
                 enviarTabuleiro(tabuleiro, out1, out2);
             }
 
-            out1.println("Fim de jogo");
-            out2.println("Fim de jogo");
+            // parar cronômetro e mostrar tempo
+            cronometro.parar();
+            int tempoFinal = cronometro.getSegundos();
+            out1.println("Fim de jogo! Tempo total: " + tempoFinal + " segundos.");
+            out2.println("Fim de jogo! Tempo total: " + tempoFinal + " segundos.");
+            System.out.println("Partida encerrada. Tempo total: " + tempoFinal + " segundos.");
 
+            // registra vencedor no XML
             if (pontosJogador1 > pontosJogador2) {
                 out1.println("Você venceu!");
                 out2.println("Jogador 1 venceu!");
@@ -91,6 +97,11 @@ public class Servidor {
         tabuleiro = new Tabuleiro();
         pontosJogador1 = 0;
         pontosJogador2 = 0;
+
+        // iniciar cronômetro zerado
+        cronometro = new Cronometro();
+        cronometro.start();
+
         enviarTabuleiro(tabuleiro, out1, out2);
     }
 
