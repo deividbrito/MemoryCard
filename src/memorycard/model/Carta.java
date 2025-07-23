@@ -1,56 +1,23 @@
-package memorycard.model;
+package memorycard;
 
 public class Carta {
-    private int id;
-    private String imagem;
-    private boolean virada;
-    private boolean encontrada;
+    private String valor;
+    private boolean encontrada = false;
+    private boolean revelada = false;
 
-    // sempre inicializa virada como false (carta virada pra baixo)
-    public Carta(int id, String imagem) {
-        this.id = id;
-        this.imagem = imagem;
-        this.virada = false;
-        this.encontrada = false;
+    public Carta(String valor) {
+        this.valor = valor;
     }
 
-    // método pra virar carta
-    public void virar() {
-        this.virada = !this.virada;
-    }
-
-    // compara se carta possui o mesmo ID (forma um par)
-    public boolean comparar(Carta outra) {
-        return this.id == outra.id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getImagem() {
-        return imagem;
-    }
-
-    public boolean isVirada() {
-        return virada;
-    }
-
-    public boolean isEncontrada() {
-        return encontrada;
-    }
-
-    public void setEncontrada(boolean encontrada) {
-        this.encontrada = encontrada;
-    }
+    public String getValor() { return valor; }
+    public boolean isEncontrada() { return encontrada; }
+    public void setEncontrada(boolean encontrada) { this.encontrada = encontrada; }
+    public boolean isRevelada() { return revelada; }
+    public void setRevelada(boolean revelada) { this.revelada = revelada; }
 
     @Override
     public String toString() {
-        return "Carta{" +
-                "id=" + id +
-                ", virada=" + virada +
-                ", encontrada=" + encontrada +
-                '}';
+        if (encontrada || revelada) return valor;
+        return "X";
     }
 }
-
