@@ -26,7 +26,7 @@ public class Cliente {
                         repr.setLength(0);
                         continue;
                     }
-                    if (linha.equals("TABULEIRO_END")) {
+                    if (linha.equals("TABULEIRO_FIM")) {
                         lendoTabuleiro = false;
                         System.out.println("\n=== TABULEIRO ===");
                         System.out.println(repr.toString());

@@ -4,8 +4,8 @@ import java.util.*;
 
 public class Tabuleiro {
     private List<Carta> cartas;
-    private int linhas = 4;
-    private int colunas = 6;
+    private int linhas = 4;   // 4 linhas
+    private int colunas = 6;  // 6 colunas
 
     public Tabuleiro() {
         List<String> valores = new ArrayList<>();

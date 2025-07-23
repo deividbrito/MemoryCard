@@ -1,7 +1,7 @@
 package memorycard;
 
 public class Cronometro extends Thread {
-    private boolean rodando = true; // volatile para leitura consistente
+    private boolean rodando = true;
     private int segundos = 0;
 
     @Override

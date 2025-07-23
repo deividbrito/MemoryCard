@@ -4,6 +4,10 @@ import java.io.*;
 import java.net.*;
 
 public class Servidor {
+    private static Tabuleiro tabuleiro;
+    private static int pontosJogador1;
+    private static int pontosJogador2;
+
     public static void main(String[] args) throws IOException {
         ServerSocket servidor = new ServerSocket(12345);
         System.out.println("Servidor aguardando na porta 12345...");
@@ -19,38 +23,78 @@ public class Servidor {
         BufferedReader in2 = new BufferedReader(new InputStreamReader(jogador2.getInputStream()));
         PrintWriter out2 = new PrintWriter(jogador2.getOutputStream(), true);
 
-        Tabuleiro tabuleiro = new Tabuleiro();
-
         out1.println("Bem-vindo! Você é o jogador 1.");
         out2.println("Bem-vindo! Você é o jogador 2.");
-        enviarTabuleiro(tabuleiro, out1, out2);
 
-        int vez = 1; // 1 ou 2
+        boolean jogarNovamente = true;
+        while (jogarNovamente) {
+            reiniciarJogo(out1, out2);
 
-        while (!tabuleiro.jogoCompleto()) {
-            if (vez == 1) {
-                out1.println("Vez do jogador 1: ");
-                String jogada = in1.readLine();
-                processarJogada(tabuleiro, jogada, out1, out2);
-                vez = 2;
-            } else {
-                out2.println("Vez do jogador 2: ");
-                String jogada = in2.readLine();
-                processarJogada(tabuleiro, jogada, out2, out1);
-                vez = 1;
+            int vez = 1; // alterna entre 1 e 2
+
+            while (!tabuleiro.jogoCompleto()) {
+                if (vez == 1) {
+                    out1.println("Vez do jogador 1: ");
+                    String jogada = in1.readLine();
+                    if (processarJogada(tabuleiro, jogada, out1, out2)) {
+                        pontosJogador1++;
+                    }
+                    vez = 2;
+                } else {
+                    out2.println("Vez do jogador 2: ");
+                    String jogada = in2.readLine();
+                    if (processarJogada(tabuleiro, jogada, out2, out1)) {
+                        pontosJogador2++;
+                    }
+                    vez = 1;
+                }
+                enviarTabuleiro(tabuleiro, out1, out2);
             }
-            enviarTabuleiro(tabuleiro, out1, out2);
-        }
 
-        out1.println("Fim de jogo");
-        out2.println("Fim de jogo");
+            out1.println("Fim de jogo");
+            out2.println("Fim de jogo");
+
+            if (pontosJogador1 > pontosJogador2) {
+                out1.println("Você venceu!");
+                out2.println("Jogador 1 venceu!");
+                VitoriasXML.registrarVitoria("Jogador1");
+            } else if (pontosJogador2 > pontosJogador1) {
+                out1.println("Jogador 2 venceu!");
+                out2.println("Você venceu!");
+                VitoriasXML.registrarVitoria("Jogador2");
+            } else {
+                out1.println("Empate!");
+                out2.println("Empate!");
+            }
+
+            out1.println("Deseja jogar novamente? (sim/nao)");
+            out2.println("Deseja jogar novamente? (sim/nao)");
+
+            String resp1 = in1.readLine();
+            String resp2 = in2.readLine();
+
+            jogarNovamente = resp1 != null && resp2 != null
+                    && resp1.equalsIgnoreCase("sim") && resp2.equalsIgnoreCase("sim");
+
+            if (!jogarNovamente) {
+                out1.println("Obrigado por jogar!");
+                out2.println("Obrigado por jogar!");
+            }
+        }
 
         jogador1.close();
         jogador2.close();
         servidor.close();
     }
 
-    private static void processarJogada(Tabuleiro tab, String jogada, PrintWriter atual, PrintWriter outro) {
+    private static void reiniciarJogo(PrintWriter out1, PrintWriter out2) {
+        tabuleiro = new Tabuleiro();
+        pontosJogador1 = 0;
+        pontosJogador2 = 0;
+        enviarTabuleiro(tabuleiro, out1, out2);
+    }
+
+    private static boolean processarJogada(Tabuleiro tab, String jogada, PrintWriter atual, PrintWriter outro) {
         try {
             String[] partes = jogada.trim().split(" ");
             int p1 = Integer.parseInt(partes[0]);
@@ -58,15 +102,15 @@ public class Servidor {
 
             if (!tab.posicaoValida(p1) || !tab.posicaoValida(p2) || p1 == p2) {
                 atual.println("Jogada inválida!");
-                return;
+                return false;
             }
 
             Carta c1 = tab.getCarta(p1);
             Carta c2 = tab.getCarta(p2);
 
             if (c1.isEncontrada() || c2.isEncontrada()) {
-                atual.println("Carta ja encontrada!");
-                return;
+                atual.println("Carta já encontrada!");
+                return false;
             }
 
             // Revela temporariamente
@@ -79,15 +123,18 @@ public class Servidor {
                 c2.setEncontrada(true);
                 atual.println("Par encontrado!");
                 outro.println("Oponente encontrou um par!");
+                return true;
             } else {
-                atual.println("Nao e par.");
+                atual.println("Não é par.");
                 outro.println("Oponente errou.");
                 try { Thread.sleep(2000); } catch (InterruptedException e) {}
                 c1.setRevelada(false);
                 c2.setRevelada(false);
+                return false;
             }
         } catch (Exception e) {
             atual.println("Erro na jogada!");
+            return false;
         }
     }
 
@@ -98,7 +145,7 @@ public class Servidor {
             for (String linha : repr.split("\n")) {
                 out.println(linha);
             }
-            out.println("TABULEIRO_END");
+            out.println("TABULEIRO_FIM");
         }
     }
 }
