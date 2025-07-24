@@ -1,6 +1,8 @@
 package memorycard;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VitoriasXML {
 
@@ -55,5 +57,28 @@ public class VitoriasXML {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    public static Map<String, Integer> lerRanking() {
+        Map<String, Integer> ranking = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(ARQUIVO))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                if (linha.contains("<jogador nome=\"")) {
+                    int nomeInicio = linha.indexOf("\"") + 1;
+                    int nomeFim = linha.indexOf("\"", nomeInicio);
+                    String nome = linha.substring(nomeInicio, nomeFim);
+
+                    int valorInicio = linha.indexOf(">") + 1;
+                    int valorFim = linha.indexOf("</jogador>");
+                    int vitorias = Integer.parseInt(linha.substring(valorInicio, valorFim).trim());
+
+                    ranking.put(nome, vitorias);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ranking;
     }
 }

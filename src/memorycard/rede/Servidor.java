@@ -1,9 +1,8 @@
 package memorycard.rede;
 
-import memorycard.model.Cronometro;
+import memorycard.VitoriasXML;
 import java.io.*;
 import java.net.*;
-import memorycard.VitoriasXML;
 
 public class Servidor {
     public static void main(String[] args) throws IOException {
@@ -26,37 +25,47 @@ public class Servidor {
 
         ServidorJogo servidorJogo = new ServidorJogo(12);
 
-
         boolean jogarNovamente = true;
         while (jogarNovamente) {
             servidorJogo.iniciarNovaPartida();
-            servidorJogo.enviarTabuleiro(out1, out2);
 
             int vez = 1;
 
             while (!servidorJogo.jogoFinalizado()) {
-                if (vez == 1) {
-                    out1.println("Vez do jogador 1: ");
-                    String jogada = in1.readLine();
-                    servidorJogo.processarJogada(jogada, 1, out1, out2);
-                    vez = 2;
-                } else {
-                    out2.println("Vez do jogador 2: ");
-                    String jogada = in2.readLine();
-                    servidorJogo.processarJogada(jogada, 2, out2, out1);
-                    vez = 1;
+                try {
+                    // Envia a vez antes do tabuleiro para garantir que o cliente saiba se pode clicar
+                    if (vez == 1) {
+                        out1.println("SUA_VEZ");
+                        out2.println("AGUARDE");
+                    } else {
+                        out2.println("SUA_VEZ");
+                        out1.println("AGUARDE");
+                    }
+
+                    servidorJogo.enviarTabuleiro(out1, out2);
+
+                    if (vez == 1) {
+                        String jogada = in1.readLine();
+                        servidorJogo.processarJogada(jogada, 1, out1, out2);
+                        vez = 2;
+                    } else {
+                        String jogada = in2.readLine();
+                        servidorJogo.processarJogada(jogada, 2, out2, out1);
+                        vez = 1;
+                    }
+
+                } catch (IOException e) {
+                    System.out.println("Erro ao processar jogada: " + e.getMessage());
+                    break;
                 }
-                servidorJogo.enviarTabuleiro(out1, out2);
             }
 
-            // Encerrar cronômetro
             servidorJogo.pararCronometro();
             int tempo = servidorJogo.getTempoFinal();
 
             out1.println("Fim de jogo! Tempo total: " + tempo + " segundos.");
             out2.println("Fim de jogo! Tempo total: " + tempo + " segundos.");
 
-            // Verifica vencedor
             int pontos1 = servidorJogo.getPontosJogador1();
             int pontos2 = servidorJogo.getPontosJogador2();
 
@@ -88,8 +97,16 @@ public class Servidor {
             }
         }
 
-        jogador1.close();
-        jogador2.close();
-        servidor.close();
+        try {
+            in1.close();
+            in2.close();
+            out1.close();
+            out2.close();
+            jogador1.close();
+            jogador2.close();
+            servidor.close();
+        } catch (IOException e) {
+            System.out.println("Erro ao fechar conexões: " + e.getMessage());
+        }
     }
 }
