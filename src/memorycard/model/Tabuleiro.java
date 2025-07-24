@@ -61,19 +61,26 @@ public class Tabuleiro {
         return false;
     }
 
-    public synchronized String gerarRepresentacao() {
+    public String gerarRepresentacao() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < linhas; i++) {
-            for (int j = 0; j < colunas; j++) {
-                int idx = i * colunas + j;
-                if (idx < cartas.size()) {
-                    sb.append("[").append(cartas.get(idx).toString()).append("] ");
+        for (int i = 0; i < cartas.size(); i++) {
+            Carta c = cartas.get(i);
+            if (c.isRevelada() || c.isEncontrada()) {
+                sb.append("[").append(c.getValor());
+                if (c.isEncontrada()) {
+                    sb.append("_").append(c.getDono()); // Exemplo: [A_1] ou [B_2]
                 }
+                sb.append("]");
+            } else {
+                sb.append("[X]");
             }
-            sb.append("\n");
+
+            if ((i + 1) % 6 == 0) sb.append("\n");
+            else sb.append(" ");
         }
         return sb.toString();
     }
+
 
     public List<Carta> getCartas() {
         return cartas;

@@ -76,6 +76,8 @@ public class ServidorJogo {
         if (c1.getValor().equals(c2.getValor())) {
             c1.setEncontrada(true);
             c2.setEncontrada(true);
+            c1.setDono(jogador);
+            c2.setDono(jogador);
 
             if (jogador == 1) {
                 pontosJogador1++;

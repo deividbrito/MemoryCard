@@ -63,29 +63,50 @@ public class TelaJogo extends JFrame {
     }
 
     public void atualizarTabuleiro(String[] linhas) {
-        painelCartas.removeAll();
-        botoesCartas.clear();
+    painelCartas.removeAll();
+    botoesCartas.clear();
 
-        int idx = 0;
-        for (String linha : linhas) {
-            for (String s : linha.trim().split(" ")) {
-                if (s.startsWith("[")) s = s.substring(1);
-                if (s.endsWith("]")) s = s.substring(0, s.length() - 1);
+    int idx = 0;
+    for (String linha : linhas) {
+        for (String s : linha.trim().split(" ")) {
+            if (s.startsWith("[")) s = s.substring(1);
+            if (s.endsWith("]")) s = s.substring(0, s.length() - 1);
 
-                JButton botao = new JButton(s.equals("X") ? "" : s);
-                botao.setEnabled(minhaVez && s.equals("X"));
-                int pos = idx;
+            String valor = "";
+            Color corFundo = UIManager.getColor("Button.background");
 
-                botao.addActionListener(e -> selecionarCarta(pos));
-                botoesCartas.add(botao);
-                painelCartas.add(botao);
-                idx++;
+            if (!s.equals("X")) {
+                if (s.contains("_")) {
+                    String[] partes = s.split("_");
+                    valor = partes[0];
+                    int dono = Integer.parseInt(partes[1]);
+
+                    if (dono == 1) {
+                        corFundo = new Color(173, 216, 230); // azul claro
+                    } else if (dono == 2) {
+                        corFundo = new Color(255, 182, 193); // vermelho claro
+                    }
+                } else {
+                    valor = s; // carta revelada, mas ainda não encontrada
+                }
             }
-        }
 
-        painelCartas.revalidate();
-        painelCartas.repaint();
+            JButton botao = new JButton(valor);
+            botao.setBackground(corFundo);
+            botao.setEnabled(minhaVez && s.equals("X"));
+            int pos = idx;
+
+            botao.addActionListener(e -> selecionarCarta(pos));
+            botoesCartas.add(botao);
+            painelCartas.add(botao);
+            idx++;
+        }
     }
+
+    painelCartas.revalidate();
+    painelCartas.repaint();
+}
+
 
     private void selecionarCarta(int pos) {
         if (!minhaVez) {
@@ -161,7 +182,6 @@ public class TelaJogo extends JFrame {
 
             if (resposta.equals("nao")) {
                 dispose();
-                new TelaInicial();
             }
         });
     }
