@@ -1,6 +1,6 @@
 package memorycard.rede;
 
-import memorycard.VitoriasXML;
+import memorycard.controller.VitoriasXML;
 import java.io.*;
 import java.net.*;
 
@@ -16,8 +16,7 @@ public class Servidor {
 
         String nome1 = in1.readLine();
         if (nome1.startsWith("NOME:")) nome1 = nome1.substring("NOME:".length());
-
-        out1.println("VOCE_EH_JOGADOR1"); // INFORMA QUE É O JOGADOR 1
+        out1.println("VOCE_EH_JOGADOR1");
 
         Socket jogador2 = servidor.accept();
         System.out.println("Jogador 2 conectado!");
@@ -27,8 +26,8 @@ public class Servidor {
         String nome2 = in2.readLine();
         if (nome2.startsWith("NOME:")) nome2 = nome2.substring("NOME:".length());
 
-        out1.println("OPONENTE " + nome2); // ALTERADO: ':' → ' '
-        out2.println("OPONENTE " + nome1); // ALTERADO: ':' → ' '
+        out1.println("OPONENTE " + nome2);
+        out2.println("OPONENTE " + nome1);
 
         ServidorJogo servidorJogo = new ServidorJogo(12);
 
@@ -49,12 +48,11 @@ public class Servidor {
 
                     servidorJogo.enviarTabuleiro(out1, out2);
 
+                    String jogada = (vez == 1) ? in1.readLine() : in2.readLine();
                     if (vez == 1) {
-                        String jogada = in1.readLine();
                         servidorJogo.processarJogada(jogada, 1, out1, out2);
                         vez = 2;
                     } else {
-                        String jogada = in2.readLine();
                         servidorJogo.processarJogada(jogada, 2, out2, out1);
                         vez = 1;
                     }
@@ -76,10 +74,15 @@ public class Servidor {
             out1.println("RESULTADO " + pontos1 + " " + pontos2);
             out2.println("RESULTADO " + pontos1 + " " + pontos2);
 
+            // Salvar no XML: ranking + histórico
             if (pontos1 > pontos2) {
                 VitoriasXML.registrarVitoria(nome1);
+                VitoriasXML.registrarPartida(nome1, pontos1, nome2, pontos2, tempo);
             } else if (pontos2 > pontos1) {
                 VitoriasXML.registrarVitoria(nome2);
+                VitoriasXML.registrarPartida(nome2, pontos2, nome1, pontos1, tempo);
+            } else {
+                VitoriasXML.registrarPartida(nome1, pontos1, nome2, pontos2, tempo);
             }
 
             out1.println("Deseja jogar novamente? (sim/nao)");

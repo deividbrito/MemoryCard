@@ -1,7 +1,53 @@
-<vitorias>
-  <jogador nome="Jogador2">4</jogador>
-  <jogador nome="Jogador1">2</jogador>
-  <jogador nome="isaias">1</jogador>
-  <jogador nome="mario">1</jogador>
-  <jogador nome="deivid">3</jogador>
-</vitorias>
+<dados>
+  <ranking>
+    <jogador nome="joao">2</jogador>
+    <jogador nome="6">1</jogador>
+    <jogador nome="maria">3</jogador>
+    <jogador nome="isaias">1</jogador>
+    <jogador nome="deivid">4</jogador>
+  </ranking>
+  <historico>
+<partida>
+      <vencedor nome="deivid" pontos="5"/>
+      <oponente nome="joao" pontos="2"/>
+      <data>2025-07-24</data>
+      <hora>16:40</hora>
+      <duracao>80</duracao>
+    </partida>
+<partida>
+      <vencedor nome="maria" pontos="4"/>
+      <oponente nome="isaias" pontos="3"/>
+      <data>2025-07-23</data>
+      <hora>19:10</hora>
+      <duracao>95</duracao>
+    </partida>
+<partida>
+      <vencedor nome="joao" pontos="6"/>
+      <oponente nome="maria" pontos="5"/>
+      <data>2025-07-22</data>
+      <hora>15:30</hora>
+      <duracao>100</duracao>
+    </partida>
+<partida>
+      <vencedor nome="deivid" pontos="7"/>
+      <oponente nome="isaias" pontos="3"/>
+      <data>2025-07-21</data>
+      <hora>14:20</hora>
+      <duracao>90</duracao>
+    </partida>
+<partida>
+      <vencedor nome="maria" pontos="6"/>
+      <oponente nome="joao" pontos="6"/>
+      <data>2025-07-20</data>
+      <hora>18:00</hora>
+      <duracao>110</duracao>
+    </partida>
+    <partida>
+      <vencedor nome="6" pontos="8"/>
+      <oponente nome="5" pontos="4"/>
+      <data>2025-07-24</data>
+      <hora>17:09</hora>
+      <duracao>131</duracao>
+    </partida>
+  </historico>
+</dados>
