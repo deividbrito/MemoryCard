@@ -1,14 +1,11 @@
-package memorycard;
+package memorycard.rede;
 
+import memorycard.model.Cronometro;
 import java.io.*;
 import java.net.*;
+import memorycard.VitoriasXML;
 
 public class Servidor {
-    private static Tabuleiro tabuleiro;
-    private static int pontosJogador1;
-    private static int pontosJogador2;
-    private static Cronometro cronometro;
-
     public static void main(String[] args) throws IOException {
         ServerSocket servidor = new ServerSocket(12345);
         System.out.println("Servidor aguardando na porta 12345...");
@@ -27,44 +24,47 @@ public class Servidor {
         out1.println("Bem-vindo! Você é o jogador 1.");
         out2.println("Bem-vindo! Você é o jogador 2.");
 
+        ServidorJogo servidorJogo = new ServidorJogo(12);
+
+
         boolean jogarNovamente = true;
         while (jogarNovamente) {
-            reiniciarJogo(out1, out2);
+            servidorJogo.iniciarNovaPartida();
+            servidorJogo.enviarTabuleiro(out1, out2);
 
-            int vez = 1; // alterna entre 1 e 2
+            int vez = 1;
 
-            while (!tabuleiro.jogoCompleto()) {
+            while (!servidorJogo.jogoFinalizado()) {
                 if (vez == 1) {
                     out1.println("Vez do jogador 1: ");
                     String jogada = in1.readLine();
-                    if (processarJogada(tabuleiro, jogada, out1, out2)) {
-                        pontosJogador1++;
-                    }
+                    servidorJogo.processarJogada(jogada, 1, out1, out2);
                     vez = 2;
                 } else {
                     out2.println("Vez do jogador 2: ");
                     String jogada = in2.readLine();
-                    if (processarJogada(tabuleiro, jogada, out2, out1)) {
-                        pontosJogador2++;
-                    }
+                    servidorJogo.processarJogada(jogada, 2, out2, out1);
                     vez = 1;
                 }
-                enviarTabuleiro(tabuleiro, out1, out2);
+                servidorJogo.enviarTabuleiro(out1, out2);
             }
 
-            // parar cronômetro e mostrar tempo
-            cronometro.parar();
-            int tempoFinal = cronometro.getSegundos();
-            out1.println("Fim de jogo! Tempo total: " + tempoFinal + " segundos.");
-            out2.println("Fim de jogo! Tempo total: " + tempoFinal + " segundos.");
-            System.out.println("Partida encerrada. Tempo total: " + tempoFinal + " segundos.");
+            // Encerrar cronômetro
+            servidorJogo.pararCronometro();
+            int tempo = servidorJogo.getTempoFinal();
 
-            // registra vencedor no XML
-            if (pontosJogador1 > pontosJogador2) {
+            out1.println("Fim de jogo! Tempo total: " + tempo + " segundos.");
+            out2.println("Fim de jogo! Tempo total: " + tempo + " segundos.");
+
+            // Verifica vencedor
+            int pontos1 = servidorJogo.getPontosJogador1();
+            int pontos2 = servidorJogo.getPontosJogador2();
+
+            if (pontos1 > pontos2) {
                 out1.println("Você venceu!");
                 out2.println("Jogador 1 venceu!");
                 VitoriasXML.registrarVitoria("Jogador1");
-            } else if (pontosJogador2 > pontosJogador1) {
+            } else if (pontos2 > pontos1) {
                 out1.println("Jogador 2 venceu!");
                 out2.println("Você venceu!");
                 VitoriasXML.registrarVitoria("Jogador2");
@@ -91,72 +91,5 @@ public class Servidor {
         jogador1.close();
         jogador2.close();
         servidor.close();
-    }
-
-    private static void reiniciarJogo(PrintWriter out1, PrintWriter out2) {
-        tabuleiro = new Tabuleiro();
-        pontosJogador1 = 0;
-        pontosJogador2 = 0;
-
-        // iniciar cronômetro zerado
-        cronometro = new Cronometro();
-        cronometro.start();
-
-        enviarTabuleiro(tabuleiro, out1, out2);
-    }
-
-    private static boolean processarJogada(Tabuleiro tab, String jogada, PrintWriter atual, PrintWriter outro) {
-        try {
-            String[] partes = jogada.trim().split(" ");
-            int p1 = Integer.parseInt(partes[0]);
-            int p2 = Integer.parseInt(partes[1]);
-
-            if (!tab.posicaoValida(p1) || !tab.posicaoValida(p2) || p1 == p2) {
-                atual.println("Jogada inválida!");
-                return false;
-            }
-
-            Carta c1 = tab.getCarta(p1);
-            Carta c2 = tab.getCarta(p2);
-
-            if (c1.isEncontrada() || c2.isEncontrada()) {
-                atual.println("Carta já encontrada!");
-                return false;
-            }
-
-            // Revela temporariamente
-            c1.setRevelada(true);
-            c2.setRevelada(true);
-            enviarTabuleiro(tab, atual, outro);
-
-            if (c1.getValor().equals(c2.getValor())) {
-                c1.setEncontrada(true);
-                c2.setEncontrada(true);
-                atual.println("Par encontrado!");
-                outro.println("Oponente encontrou um par!");
-                return true;
-            } else {
-                atual.println("Não é par.");
-                outro.println("Oponente errou.");
-                try { Thread.sleep(2000); } catch (InterruptedException e) {}
-                c1.setRevelada(false);
-                c2.setRevelada(false);
-                return false;
-            }
-        } catch (Exception e) {
-            atual.println("Erro na jogada!");
-            return false;
-        }
-    }
-
-    private static void enviarTabuleiro(Tabuleiro tab, PrintWriter... outs) {
-        String repr = tab.gerarRepresentacao();
-        for (PrintWriter out : outs) {
-            out.println("TABULEIRO_START");
-            for (String linha : repr.split("\n")) {
-                out.println(linha);
-            }
-            out.println("TABULEIRO_FIM");
-        }
     }
 }
