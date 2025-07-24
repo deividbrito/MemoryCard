@@ -1,6 +1,8 @@
 package memorycard.rede;
 
+import memorycard.view.TelaInicial;
 import memorycard.view.TelaJogo;
+
 import javax.swing.*;
 import java.io.*;
 import java.net.*;
@@ -42,16 +44,34 @@ public class ClienteJogo {
             while ((linha = in.readLine()) != null) {
                 System.out.println("[DEBUG] Mensagem recebida: " + linha);
 
-                // primeiro tratamos as mensagens de controle de turno
                 if (linha.equals("SUA_VEZ")) {
                     tela.setMinhaVez(true);
                     continue;
                 } else if (linha.equals("AGUARDE")) {
                     tela.setMinhaVez(false);
                     continue;
+                } else if (linha.startsWith("PONTOS ")) {
+                    int pontos = Integer.parseInt(linha.split(" ")[1]);
+                    tela.atualizarPontos(pontos);
+                    continue;
+                } else if (linha.startsWith("PLACAR_FINAL ")) {
+                    String[] partes = linha.split(" ");
+                    int p1 = Integer.parseInt(partes[1]);
+                    int p2 = Integer.parseInt(partes[2]);
+                    tela.mostrarResultadoFinal(p1, p2);
+                    continue;
+                } else if (linha.equalsIgnoreCase("Deseja jogar novamente? (sim/nao)")) {
+                    tela.perguntarNovaPartida(resposta -> enviarJogada(resposta));
+                    continue;
+                } else if (linha.equalsIgnoreCase("Obrigado por jogar!")) {
+                    tela.adicionarMensagem("Obrigado por jogar!");
+                    SwingUtilities.invokeLater(() -> {
+                        tela.dispose();
+                        new TelaInicial();
+                    });
+                    break; // encerra o loop
                 }
 
-                // depois processamos o tabuleiro
                 if (linha.equals("TABULEIRO_START")) {
                     lendoTabuleiro = true;
                     tabuleiro.setLength(0);

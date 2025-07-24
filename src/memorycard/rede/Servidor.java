@@ -69,6 +69,9 @@ public class Servidor {
             int pontos1 = servidorJogo.getPontosJogador1();
             int pontos2 = servidorJogo.getPontosJogador2();
 
+            out1.println("PLACAR_FINAL " + pontos1 + " " + pontos2);
+            out2.println("PLACAR_FINAL " + pontos1 + " " + pontos2);
+            
             if (pontos1 > pontos2) {
                 out1.println("Você venceu!");
                 out2.println("Jogador 1 venceu!");

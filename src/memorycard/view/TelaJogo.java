@@ -12,11 +12,11 @@ public class TelaJogo extends JFrame {
     private JPanel painelCartas;
     private JTextArea areaLog;
     private JLabel labelJogador, labelPontos;
-
     private List<JButton> botoesCartas = new ArrayList<>();
     private int primeiraSelecao = -1;
     private ClienteJogo cliente;
     private boolean minhaVez = false;
+    private boolean perguntandoNovaPartida = false;
 
     public TelaJogo(String nomeJogador) {
         setTitle("Memory Card - Jogador: " + nomeJogador);
@@ -50,7 +50,6 @@ public class TelaJogo extends JFrame {
         this.cliente = cliente;
     }
 
-    // Atualiza o tabuleiro com os dados recebidos do servidor
     public void atualizarTabuleiro(String[] linhas) {
         painelCartas.removeAll();
         botoesCartas.clear();
@@ -123,5 +122,49 @@ public class TelaJogo extends JFrame {
 
     public void atualizarPontos(int pontos) {
         labelPontos.setText("Pontos: " + pontos);
+    }
+
+    public void mostrarResultadoFinal(int pontos1, int pontos2) {
+        String nome = labelJogador.getText().replace("Jogador: ", "");
+        boolean souJogador1 = cliente != null && cliente.toString().contains("jogador 1");
+
+        int meusPontos = souJogador1 ? pontos1 : pontos2;
+        int pontosOponente = souJogador1 ? pontos2 : pontos1;
+        String nomeOponente = souJogador1 ? "Jogador 2" : "Jogador 1";
+
+        String vencedor;
+        if (meusPontos > pontosOponente) {
+            vencedor = "Você venceu!";
+        } else if (meusPontos < pontosOponente) {
+            vencedor = nomeOponente + " venceu!";
+        } else {
+            vencedor = "Empate!";
+        }
+
+        String msg = vencedor + "\n\nPlacar final:\n" +
+                     nome + ": " + meusPontos + " ponto(s)\n" +
+                     nomeOponente + ": " + pontosOponente + " ponto(s)";
+
+        JOptionPane.showMessageDialog(this, msg, "Resultado Final", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    
+    public void perguntarNovaPartida(java.util.function.Consumer<String> callback) {
+        if (perguntandoNovaPartida) return;
+        perguntandoNovaPartida = true;
+
+        SwingUtilities.invokeLater(() -> {
+            int opcao = JOptionPane.showConfirmDialog(this,
+                    "Deseja jogar novamente?", "Nova partida",
+                    JOptionPane.YES_NO_OPTION);
+
+            String resposta = (opcao == JOptionPane.YES_OPTION) ? "sim" : "nao";
+            callback.accept(resposta);
+
+            if (resposta.equals("nao")) {
+                dispose(); // fecha a janela atual
+                new TelaInicial(); // volta para o menu inicial
+            }
+        });
     }
 }
