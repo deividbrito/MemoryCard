@@ -17,15 +17,18 @@ public class TelaJogo extends JFrame {
     private ClienteJogo cliente;
     private boolean minhaVez = false;
     private boolean perguntandoNovaPartida = false;
+    private String nomeJogador;
+    private String nomeOponente = "";
 
     public TelaJogo(String nomeJogador) {
+        this.nomeJogador = nomeJogador;
+
         setTitle("Memory Card - Jogador: " + nomeJogador);
         setSize(600, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Norte - Info do jogador
         JPanel topo = new JPanel(new GridLayout(1, 2));
         labelJogador = new JLabel("Jogador: " + nomeJogador);
         labelPontos = new JLabel("Pontos: 0");
@@ -33,11 +36,9 @@ public class TelaJogo extends JFrame {
         topo.add(labelPontos);
         add(topo, BorderLayout.NORTH);
 
-        // Centro - Cartas
-        painelCartas = new JPanel(new GridLayout(4, 6)); // padrão 24 cartas
+        painelCartas = new JPanel(new GridLayout(4, 6));
         add(painelCartas, BorderLayout.CENTER);
 
-        // Sul - Área de log
         areaLog = new JTextArea(5, 40);
         areaLog.setEditable(false);
         JScrollPane scroll = new JScrollPane(areaLog);
@@ -50,13 +51,22 @@ public class TelaJogo extends JFrame {
         this.cliente = cliente;
     }
 
+    public void setNomeJogador(String nome) {
+        this.nomeJogador = nome;
+        if (labelJogador != null) {
+            labelJogador.setText("Jogador: " + nome);
+        }
+    }
+
+    public void setNomeOponente(String nomeOponente) {
+        this.nomeOponente = nomeOponente;
+    }
+
     public void atualizarTabuleiro(String[] linhas) {
         painelCartas.removeAll();
         botoesCartas.clear();
 
         int idx = 0;
-        System.out.println("[DEBUG] Atualizando tabuleiro. É minha vez? " + minhaVez);
-
         for (String linha : linhas) {
             for (String s : linha.trim().split(" ")) {
                 if (s.startsWith("[")) s = s.substring(1);
@@ -65,10 +75,6 @@ public class TelaJogo extends JFrame {
                 JButton botao = new JButton(s.equals("X") ? "" : s);
                 botao.setEnabled(minhaVez && s.equals("X"));
                 int pos = idx;
-
-                if (botao.isEnabled()) {
-                    System.out.println("[DEBUG] Carta " + pos + " está habilitada.");
-                }
 
                 botao.addActionListener(e -> selecionarCarta(pos));
                 botoesCartas.add(botao);
@@ -90,11 +96,9 @@ public class TelaJogo extends JFrame {
         if (primeiraSelecao == -1) {
             primeiraSelecao = pos;
             botoesCartas.get(pos).setEnabled(false);
-            System.out.println("[DEBUG] Primeira carta selecionada: " + pos);
         } else {
             String jogada = primeiraSelecao + " " + pos;
             cliente.enviarJogada(jogada);
-            System.out.println("[DEBUG] Jogada enviada: " + jogada);
             primeiraSelecao = -1;
             desabilitarCartas();
         }
@@ -108,12 +112,7 @@ public class TelaJogo extends JFrame {
 
     public void setMinhaVez(boolean vez) {
         this.minhaVez = vez;
-        System.out.println("[DEBUG] setMinhaVez: " + vez);
-        if (vez) {
-            adicionarMensagem("Sua vez de jogar!");
-        } else {
-            adicionarMensagem("Aguardando o outro jogador...");
-        }
+        adicionarMensagem(vez ? "Sua vez de jogar!" : "Aguardando o outro jogador...");
     }
 
     public void adicionarMensagem(String msg) {
@@ -124,31 +123,30 @@ public class TelaJogo extends JFrame {
         labelPontos.setText("Pontos: " + pontos);
     }
 
-    public void mostrarResultadoFinal(int pontos1, int pontos2) {
-        String nome = labelJogador.getText().replace("Jogador: ", "");
-        boolean souJogador1 = cliente != null && cliente.toString().contains("jogador 1");
+    public void mostrarResultadoFinal(int pontosJogador1, int pontosJogador2) {
+        int meusPontos, pontosOponente;
+        String nomeVencedor, mensagem;
 
-        int meusPontos = souJogador1 ? pontos1 : pontos2;
-        int pontosOponente = souJogador1 ? pontos2 : pontos1;
-        String nomeOponente = souJogador1 ? "Jogador 2" : "Jogador 1";
+        boolean souJogador1 = cliente.isPrimeiroJogador();
+        meusPontos = souJogador1 ? pontosJogador1 : pontosJogador2;
+        pontosOponente = souJogador1 ? pontosJogador2 : pontosJogador1;
 
-        String vencedor;
         if (meusPontos > pontosOponente) {
-            vencedor = "Você venceu!";
+            mensagem = "Você venceu!";
         } else if (meusPontos < pontosOponente) {
-            vencedor = nomeOponente + " venceu!";
+            mensagem = nomeOponente + " venceu!";
         } else {
-            vencedor = "Empate!";
+            mensagem = "Empate!";
         }
 
-        String msg = vencedor + "\n\nPlacar final:\n" +
-                     nome + ": " + meusPontos + " ponto(s)\n" +
-                     nomeOponente + ": " + pontosOponente + " ponto(s)";
+        String texto = mensagem + "\n\nPlacar final:\n"
+                + nomeJogador + ": " + meusPontos + " ponto(s)\n"
+                + nomeOponente + ": " + pontosOponente + " ponto(s)";
 
-        JOptionPane.showMessageDialog(this, msg, "Resultado Final", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, texto, "Resultado Final", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    
+
     public void perguntarNovaPartida(java.util.function.Consumer<String> callback) {
         if (perguntandoNovaPartida) return;
         perguntandoNovaPartida = true;
@@ -162,8 +160,8 @@ public class TelaJogo extends JFrame {
             callback.accept(resposta);
 
             if (resposta.equals("nao")) {
-                dispose(); // fecha a janela atual
-                new TelaInicial(); // volta para o menu inicial
+                dispose();
+                new TelaInicial();
             }
         });
     }

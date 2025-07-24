@@ -53,11 +53,10 @@ public class TelaInicial extends JFrame {
         dispose();
 
         TelaJogo telaJogo = new TelaJogo(nome);
-        ClienteJogo cliente = new ClienteJogo(ip, 12345, telaJogo);
+        ClienteJogo cliente = new ClienteJogo(ip, 12345, telaJogo, nome); // <- corrigido aqui
         telaJogo.setCliente(cliente);
         cliente.iniciar();
     }
-
 
     private void abrirRanking() {
         dispose();

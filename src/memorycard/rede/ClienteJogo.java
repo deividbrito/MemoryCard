@@ -13,13 +13,20 @@ public class ClienteJogo {
     private BufferedReader in;
     private PrintWriter out;
     private TelaJogo tela;
+    private String nomeJogador;
+    private String nomeOponente;
+    private boolean primeiroJogador = false;
 
-    public ClienteJogo(String ip, int porta, TelaJogo tela) {
+    public ClienteJogo(String ip, int porta, TelaJogo tela, String nomeJogador) {
         try {
             this.socket = new Socket(ip, porta);
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.out = new PrintWriter(socket.getOutputStream(), true);
             this.tela = tela;
+            this.nomeJogador = nomeJogador;
+            this.tela.setNomeJogador(nomeJogador);
+
+            out.println(nomeJogador); // envia o nome ao servidor
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Erro ao conectar: " + e.getMessage());
             System.exit(1);
@@ -35,6 +42,14 @@ public class ClienteJogo {
         out.println(jogada);
     }
 
+    public void setPrimeiroJogador(boolean valor) {
+        this.primeiroJogador = valor;
+    }
+
+    public boolean isPrimeiroJogador() {
+        return primeiroJogador;
+    }
+
     private void receberMensagens() {
         try {
             String linha;
@@ -43,6 +58,11 @@ public class ClienteJogo {
 
             while ((linha = in.readLine()) != null) {
                 System.out.println("[DEBUG] Mensagem recebida: " + linha);
+
+                if (linha.equals("VOCE_EH_JOGADOR1")) {
+                    setPrimeiroJogador(true);
+                    continue;
+                }
 
                 if (linha.equals("SUA_VEZ")) {
                     tela.setMinhaVez(true);
@@ -54,11 +74,9 @@ public class ClienteJogo {
                     int pontos = Integer.parseInt(linha.split(" ")[1]);
                     tela.atualizarPontos(pontos);
                     continue;
-                } else if (linha.startsWith("PLACAR_FINAL ")) {
-                    String[] partes = linha.split(" ");
-                    int p1 = Integer.parseInt(partes[1]);
-                    int p2 = Integer.parseInt(partes[2]);
-                    tela.mostrarResultadoFinal(p1, p2);
+                } else if (linha.startsWith("OPONENTE ")) {
+                    nomeOponente = linha.substring(9); // remove "OPONENTE "
+                    tela.setNomeOponente(nomeOponente);
                     continue;
                 } else if (linha.equalsIgnoreCase("Deseja jogar novamente? (sim/nao)")) {
                     tela.perguntarNovaPartida(resposta -> enviarJogada(resposta));
@@ -69,7 +87,15 @@ public class ClienteJogo {
                         tela.dispose();
                         new TelaInicial();
                     });
-                    break; // encerra o loop
+                    break;
+                } else if (linha.startsWith("RESULTADO ")) {
+                    // Exemplo: RESULTADO 6 4
+                    String[] partes = linha.split(" ");
+                    int pontosJogador1 = Integer.parseInt(partes[1]);
+                    int pontosJogador2 = Integer.parseInt(partes[2]);
+
+                    tela.mostrarResultadoFinal(pontosJogador1, pontosJogador2);
+                    continue;
                 }
 
                 if (linha.equals("TABULEIRO_START")) {
